@@ -62,4 +62,6 @@ npm run data:import -- ..\visibility-buffer-bench\results\dashboard_bundle.json
 
 2026-08-19에 clean `out/build/reproduce-Release` configure/build를 완료했고 synthetic smoke 6/6이 success, salvaged/failed/skipped 0이었다. 정규화 결과는 runs 6, passes 39, frames 0이었으며 total과 pass-breakdown PNG/SVG, 단일 dashboard bundle이 생성됐다.
 
-실제 scene 전체 재현은 scene asset이 로컬 배포 대상이 아니므로 해당 경로가 구성된 머신에서 수행해야 한다. 장면 없이 생기는 skip과 renderer crash는 구분한다.
+같은 날 Sponza, Sponza + Ivy, Bistro Exterior/Interior 경로를 구성해 portfolio suite를 검증했다. 15 specs의 786 runs 중 783이 success였고 failed/salvaged는 0이었다. 나머지 3개는 검증 머신에 San Miguel, Sun Temple, Zero Day가 없어 `skipped_missing_asset`으로 기록됐다.
+
+Sponza와 Bistro barycentric validation은 raster reference와 VisBuf reconstruction을 합쳐 28/28 runs가 전체 camera playback을 완료했다. Sponza run마다 2,500 measured frames와 42 captures, Bistro run마다 5,500 measured frames와 46 captures 및 sidecar CSV가 생성됐다. 장면 없이 생기는 skip과 renderer crash는 `run_report.json`에서 계속 구분한다.

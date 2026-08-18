@@ -20,23 +20,23 @@ VisibilityBufferInfo는 Triangle Visibility Buffer(TVB)가 Forward / Deferred �
 작업 시작 전 의도 파악이 필요하면 아래 순서로 읽는다.
 
 1. [README.md](README.md) - 프로젝트 목적과 비교 알고리즘 개요
-2. [docs/프롬프트.txt](docs/프롬프트.txt) - 연구 질문, 실험 설계, 성능 모델 관점
-3. [docs/프롬프트_진행상황.txt](docs/프롬프트_진행상황.txt) - 누적 진행상황과 남은 항목
-4. [docs/4주차.txt](docs/4주차.txt) - 최신 방향 메모. 실제 scene, visibility 고도화, 발표/영상 요구가 강함
-5. [docs/TODO_pending.txt](docs/TODO_pending.txt) - 현재 짧은 TODO
-6. Donut renderer나 실제 scene 구조를 건드릴 때는 [docs/donut deferred buffers.txt](<docs/donut deferred buffers.txt>)도 읽는다.
-
-`docs/prev_*`는 과거 메모다. 연구 배경을 확인할 때는 유용하지만, 현재 구현 지침보다 우선하지 않는다.
+2. [docs/methodology.md](docs/methodology.md) - 연구 질문과 비교 공정성
+3. [docs/results.md](docs/results.md) - 대표 관찰, 해석, 한계
+4. [docs/experiments.md](docs/experiments.md) - 과거 실험의 canonical spec 이관 상태
+5. [docs/reproducibility.md](docs/reproducibility.md) - clean build, 실행, 결과 계약
+6. [experiments/README.md](experiments/README.md) - spec과 suite 작성법
 
 ## 코드 구조
 
 - `src/`, `include/`: C++20 Direct3D 12 코드
 - `assets/shaders/`: HLSL 셰이더. CMake가 빌드 출력의 `assets/shaders`로 복사한다. 셰이더 자체를 CMake에서 컴파일하지는 않는다.
 - `assets/shaders/donut/`: NVIDIA Donut에서 가져온/수정한 셰이더. 라이선스 고지는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)를 유지한다.
-- `scripts/run.py`: 현재 실험 실행 진입점. 이전 `script_libs` 기능이 이 파일로 합쳐져 있고, `script_libs` 패키지는 제거되었다.
-- `scripts/*.json`: 실험 spec. `base`, `sweep`, `samples`를 사용한다.
-- `scripts/results/succeed`, `scripts/results/failed`: 보존된 연구 결과 번들. 임의 삭제/정리 금지.
-- `datas/`: 과거/보조 실험 데이터와 리포트.
+- `scripts/reproduce.py`: build, run, normalize, plot, dashboard export의 단일 진입점.
+- `scripts/run.py`: low-level/legacy-compatible runner wrapper.
+- `scripts/tvbbench/`: runner, spec expansion, normalization, plotting, export module.
+- `experiments/specs/`: canonical experiment JSON. `base`, `sweep`, `samples`를 사용한다.
+- `experiments/suites/`: smoke, portfolio, all 묶음.
+- `results/`: 재생성 가능한 로컬 결과. Git에 포함하지 않는다.
 - `external/assimp`: 로컬 Assimp 소스. `.gitignore`상 `external/`은 보통 로컬 대용량/외부 의존성으로 취급된다.
 - `out/`: CMake build output. 재생성 가능.
 - `assets/scenes/`: 로컬 실제 scene asset. git에는 들어가지 않는 전제다.
@@ -67,23 +67,23 @@ out/build/x64-Release/bin/Release/TVBPerf.exe
 out/build/x64-Debug/bin/Debug/TVBPerf.exe
 ```
 
-실험 sweep은 루트가 아니라 `scripts` 기준 상대 경로를 많이 쓴다.
+대표 재현 명령은 저장소 루트에서 실행한다.
 
 ```powershell
-cd scripts
-python run.py scene_geom_bistro_ex1.json
+python scripts/reproduce.py --suite smoke --build --overwrite
 ```
 
-`scripts/run.py`의 정책:
+`scripts/reproduce.py`와 내부 runner의 정책:
 
 - spec의 base/sweep/samples key를 command-line argument로 변환하고, runner가 필요한 `run-id`, `run-name`, `output-filepath`, `auto-terminate`를 덮어쓴다.
 - JSON key에서 `-`는 `_`로 정규화한다.
 - `_`로 시작하는 JSON key는 무시된다. 예: `_renderer_variant`
 - ProgramArgument 인자 이름과 값의 유효성 검증은 Python이 아니라 C++ parser/validator가 담당한다.
 - `sweep`과 `samples`는 동시에 쓰지 않는다.
-- 각 run은 임시 CSV를 만들고, 결과 CSV와 sidecar CSV를 `scripts/results/<experiment>/...`로 복사한다.
+- 각 run은 임시 CSV를 만들고 결과와 sidecar를 `results/<spec-id>/`로 모은다.
 - stderr나 로그 경로가 있으면 return code가 0이어도 `salvaged`로 기록될 수 있다. 이는 데이터가 없는 실패와 다르다.
 - playback mode에서는 C++가 `output_filepath_<run_id>_result.csv` 같은 windowed sidecar CSV를 추가로 만든다.
+- suite 완료 후 `results/dashboard_bundle.json` 하나로 정규화 표와 PNG를 묶는다.
 
 실험 spec을 수정할 때는 `executable`, `camera_filepath`, `scene_path`, `measure_frames`, `warmup_frames`, `profile_window_frames`, `use_vfc`, `to_load_texture`, `renderer_variant`를 특히 확인한다.
 
@@ -99,6 +99,13 @@ python run.py scene_geom_bistro_ex1.json
 - `6`: `RendererVisBufGBuffer()` -> VisBuf + G-buffer
 - `7`: `RendererDonutDeferred(false)` -> DonutDeferred
 - `8`: `RendererDonutDeferred(true)` -> DonutDeferredPrepass
+- `9`: `RendererDonutVisGBuffer()` -> DonutVisBuf + G-buffer
+- `10`: `RendererRasterStats()`
+- `11`: `RendererDebugView()`
+- `12`: `RendererVisBufDebug()`
+- `13`: `RendererDonutVisDebug()`
+- `14`: `RendererDonutRasterDebug()`
+- `15`: `RendererDonutVisCompactDebug()`
 
 새 variant를 추가하면 다음을 함께 맞춘다.
 
@@ -115,11 +122,11 @@ C++ 실행 인자는 `include/ProgramArgument.h`의 `ProgramArgument_MAC`가 기
 - `include/ProgramArgument.h`
 - `src/ProgramArgument.cpp`
 - `src/util/ProgramArgumentValidator.cpp`
-- `scripts/run.py`의 command-line argument 생성 흐름
-- 기존 `scripts/*.json`과 `scripts/results/**/<experiment>.json`
+- `scripts/tvbbench/runner.py`의 command-line argument 생성 흐름
+- `experiments/specs/**/*.json`
 - CSV header를 읽는 `PROGRAM_RESULT_FIELDS`
 
-주의: `scripts/run.py`는 더 이상 C++ `ProgramArgument` 기본값이나 유효 인자 목록을 들고 있지 않다. spec에 없는 인자는 C++ 기본값을 사용하고, 알 수 없는 인자 이름/값 검증은 C++ parser와 `ProgramArgumentValidator`가 담당한다. 반복 가능한 실험에서는 기본값에 기대지 말고 spec에서 의도한 값을 명시하는 편이 안전하다.
+주의: Python runner는 C++ `ProgramArgument` 기본값을 복제하지 않는다. canonical spec 정적 검증은 header의 인자 이름을 읽고, 값 검증은 C++ parser와 `ProgramArgumentValidator`가 담당한다. 반복 가능한 실험에서는 기본값에 기대지 말고 의도한 값을 명시한다.
 
 ## 측정과 CSV
 
@@ -208,16 +215,16 @@ Donut CPU/GPU scene 계약의 핵심:
 - texture loading을 건드릴 때는 sRGB/linear 색공간, embedded texture, fallback texture, unsupported format logging을 함께 본다.
 - TODO에 embedded texture loading이 있었고 일부 로직은 아직 fallback에 의존할 수 있다.
 
-## 실험 데이터 보존
+## 실험 데이터 정책
 
-`scripts/results/succeed`, `scripts/results/failed`, `datas/`의 CSV/PNG/HTML/JSON/리포트는 연구 증거물이다. 요청 없이 삭제, 압축 해제 재배치, 포맷 변경, 대량 재생성하지 않는다.
+source repository에는 결과 파일 대신 canonical spec과 generator를 저장한다. `results/`의 CSV/PNG/SVG/JSON은 로컬 생성물이며 Git ignore다. 사용자가 실행 중일 수 있으므로 명시 요청 없이 지우거나 덮어쓰지 않는다.
 
 재생성 가능한 로컬 산출물:
 
 - `out/`
 - `.vs/`
 - `logs/`
-- `scripts/results/default/`
+- `results/`
 - Python `__pycache__/`
 
 위 산출물도 사용자가 방금 실행 중일 수 있으므로 정리 작업은 명시 요청이 있을 때만 한다.
@@ -245,7 +252,7 @@ Donut CPU/GPU scene 계약의 핵심:
    ```powershell
    cmake --build out/build/x64-Release --config Release
    ```
-4. 실험 runner 변경: 작은 JSON 또는 기존 spec의 축소판으로 `python scripts/run.py <spec>` 실행
+4. 실험 runner 변경: `python scripts/reproduce.py --verify`, smoke dry-run과 작은 spec 실행
 5. ProgramArgument 변경: unknown key 검증, C++ header CSV, Python `PROGRAM_RESULT_FIELDS` 확인
 6. Renderer/pass 변경: pass name, timestamp slot, resource transition, descriptor heap size 확인
 7. 실제 scene 변경: scene asset 부재 가능성을 분리해서 보고하고, asset이 있을 때 camera playback으로 최소 실행 확인

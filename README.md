@@ -74,3 +74,15 @@
 - material별 work queue를 구성해 binning으로 별도의 shader 사용
 - 기타 material에 대한 다양한 접근
 
+## 라이선스와 외부 자산
+
+- 직접 작성한 프로젝트 코드는 [LICENSE](LICENSE)의 MIT License를 따른다.
+- 외부 라이브러리와 NVIDIA Donut 유래 셰이더는
+  [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)를 따른다.
+- Sponza, Bistro, San Miguel, Sun Temple, Zero-Day 등 장면의 출처와 이용
+  조건은 [SCENE_ASSET_NOTICES.md](SCENE_ASSET_NOTICES.md)에 분리했다.
+- `datas/`의 측정 데이터·그래프·이미지와 연구 문서는 MIT 코드
+  라이선스 대상이 아니다. 별도 표시가 없는 한 재사용 라이선스가
+  부여되지 않으며, 장면을 묘사한 이미지에는 해당 장면의 조건도 함께
+  적용될 수 있다.
+

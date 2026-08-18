@@ -1,8 +1,13 @@
-# Third-Party Scene Asset Notices and Licenses
+# Scene Asset Notices
 
 This document contains the license notices, attribution statements, source
 references, and modification disclosures for third-party scene assets used by
 VisibilityBufferInfo.
+
+The original scene archives are not part of this Git repository. Local scene
+copies under `assets/scenes/` are ignored by Git. Benchmark specifications,
+numeric results, plots, and validation images may nevertheless identify or
+depict these scenes, so their provenance is recorded here.
 
 This document does not license the VisibilityBufferInfo source code and does
 not relicense any third-party asset. Each asset remains subject to the license
@@ -19,6 +24,9 @@ copy.
 | Bistro Exterior | Amazon Lumberyard / NVIDIA Open Research Content Archive | Creative Commons Attribution 4.0 International |
 | Bistro Interior with Wine | Amazon Lumberyard / NVIDIA Open Research Content Archive | Creative Commons Attribution 4.0 International |
 | Sponza Atrium 2.0 Base Scene (`Intel Sponza Base Scene`) | Frank Meinl; distributed through Intel GPU Research Samples | See Section 3: Intel distribution notice and ASWF Digital Assets License v1.1 |
+| Sponza Atrium 2.0 Ivy add-on | Frank Meinl and the Sponza add-on contributors; distributed through Intel GPU Research Samples | Retain the license/EULA supplied in the downloaded add-on; Intel lists its sample downloads under Creative Commons Attribution |
+| San Miguel 2.0 | Guillermo M. Leal Llaguno; archive conversion by Morgan McGuire and contributors | Creative Commons Attribution 3.0 Unported |
+| UE4 Sun Temple | Epic Games; NVIDIA ORCA conversion by Kai-Hwa Yao and Nicholas Hull | Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International |
 | Pawn Shop | Poly Haven and contributing artists | CC0 1.0 Universal |
 | The Hidden Alley | Poly Haven and contributing artists | CC0 1.0 Universal |
 | The Shed | Poly Haven and contributing artists | CC0 1.0 Universal |
@@ -36,7 +44,8 @@ VisibilityBufferInfo may differ from the original assets. Modifications may
 include:
 
 - archive extraction and directory reorganization;
-- conversion from FBX, Blender, USD, or another source format to glTF;
+- conversion between FBX, OBJ, glTF, Blender, or another supported source
+  format;
 - coordinate-system conversion;
 - mesh triangulation;
 - generation or recalculation of normals and tangents;
@@ -136,6 +145,7 @@ its benchmark results, or any product tested with these assets.
 
 - Sponza Atrium 2.0 Base Scene, distributed by Intel under the title
   `Sponza Base Scene`
+- Sponza Atrium 2.0 Ivy add-on, distributed by Intel under the title `Ivy`
 
 ### Sources
 
@@ -224,7 +234,86 @@ resale.
 
 ---
 
-## 4. Poly Haven scene files
+## 4. San Miguel 2.0
+
+### Covered scene
+
+- `San_Miguel/san-miguel.obj`, referenced by retained multi-scene benchmark
+  specifications and results
+
+### Attribution
+
+> “San Miguel 2.0” was originally modeled by Guillermo M. Leal Llaguno of
+> Evolucien Visual. The 2017 research versions were improved by Morgan
+> McGuire, Guedis Cardenas, Michael Mara, and Nicholas Hull with permission
+> from Guillermo M. Leal Llaguno. The version used by VisibilityBufferInfo may
+> contain further benchmark-oriented changes described in the Modification
+> disclosure section of this document.
+
+### Source and citation
+
+- Morgan McGuire Computer Graphics Archive:
+  https://casual-effects.com/g3d/data10/index.html
+- Requested archive citation: Morgan McGuire, *Computer Graphics Archive*,
+  July 2017, https://casual-effects.com/data
+
+### License
+
+- Creative Commons Attribution 3.0 Unported (`CC-BY-3.0`)
+- https://creativecommons.org/licenses/by/3.0/legalcode
+
+Attribution must identify the original creator and the archive contributors,
+link the license, and indicate modifications. The license notice supplied in
+the downloaded archive remains authoritative for that copy.
+
+---
+
+## 5. UE4 Sun Temple
+
+### Covered scene
+
+- `SunTemple_v4/SunTemple.fbx`, referenced by retained multi-scene benchmark
+  specifications and results
+
+### Attribution
+
+> “Unreal Engine Sun Temple, Open Research Content Archive (ORCA)” by Epic
+> Games, October 2017. Exported from Unreal Engine by Kai-Hwa Yao and Nicholas
+> Hull. Licensed under Creative Commons Attribution-NonCommercial-ShareAlike
+> 4.0 International. The version used by VisibilityBufferInfo may contain
+> further benchmark-oriented changes described in the Modification disclosure
+> section of this document.
+
+### Source
+
+- https://developer.nvidia.com/ue4-sun-temple
+
+### License
+
+- Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+  (`CC-BY-NC-SA-4.0`)
+- https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+This asset cannot be redistributed or used for commercial purposes under this
+license. Adapted material must be shared under the same license, with
+attribution, a license link, and a change notice. Do not include the scene in a
+commercial release without obtaining separate permission.
+
+### Reference citation
+
+```bibtex
+@misc{OrcaUE4SunTemple,
+  title  = {Unreal Engine Sun Temple, Open Research Content Archive (ORCA)},
+  author = {Epic Games},
+  year   = {2017},
+  month  = {October},
+  url    = {https://developer.nvidia.com/ue4-sun-temple}
+}
+```
+
+---
+
+## 6. Poly Haven scene files
 
 ### Covered scenes
 
@@ -281,6 +370,10 @@ thumbnails, user gallery renders, or unrelated website content.
 
 - Creative Commons Attribution 4.0 International:
   https://creativecommons.org/licenses/by/4.0/legalcode
+- Creative Commons Attribution 3.0 Unported:
+  https://creativecommons.org/licenses/by/3.0/legalcode
+- Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International:
+  https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 - Creative Commons CC0 1.0 Universal:
   https://creativecommons.org/publicdomain/zero/1.0/legalcode
 - ASWF Digital Assets License v1.1:
@@ -291,12 +384,14 @@ thumbnails, user gallery renders, or unrelated website content.
 1. Retain this document with the scene assets.
 2. Retain every license, EULA, README, and credit file supplied in each
    original archive.
-3. Retain the Bistro and Zero-Day CC BY 4.0 attribution statements.
+3. Retain the Bistro and Zero-Day CC BY 4.0 attribution statements, the San
+   Miguel CC BY 3.0 attribution, and the Sun Temple CC BY-NC-SA 4.0
+   attribution and ShareAlike terms.
 4. Describe actual modifications made to redistributed CC BY or Sponza
    copies.
 5. Include the Sponza copyright notice in publications containing Sponza
    renders.
 6. Do not imply endorsement by any asset creator, Intel, NVIDIA, Amazon
-   Lumberyard, Poly Haven, or their contributors.
+   Lumberyard, Epic Games, Poly Haven, or their contributors.
 7. Preserve each asset's original download URL, download date, archive
    filename, and checksum in its associated manifest.

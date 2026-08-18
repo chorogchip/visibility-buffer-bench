@@ -13,10 +13,9 @@
 #include "dx_util/ResourceUtils.h"
 #include "engine/ResourceManagerShader.h"
 #include "scene/SceneFingerprint.h"
+#include "scene/builder/cpu/SceneCPUBuilder.h"
 #include "scene/builder/cpu/SceneCPUDrawStreamBuilder.h"
-#include "scene/cache/SceneCPUCache.h"
 #include "scene/builder/gpu/BenchmarkSceneGPUBuilder.h"
-#include "scene/builder/gpu/JungleSceneGPUBuilder.h"
 #include "scene/builder/source/SceneSourceFactory.h"
 
 namespace rndr {
@@ -40,7 +39,10 @@ namespace rndr {
         for (UINT i = 0; i < util::Constants::FRAME_COUNT; ++i)
             buf_constant_[i].init(device_.Get());
 
-        scene_cpu_ = scene::load_or_build_scene_cpu(program_argument_);
+        auto scene_source =
+            scene::SceneSourceFactory::create_scene(program_argument_);
+        scene_cpu_ = std::make_unique<scene::SceneCPUData>(
+            scene::SceneCPUBuilder::build(*scene_source));
         scene::SceneCPUDrawStreamBuilder::build_all(
             *scene_cpu_,
             draw_stream_);
@@ -59,27 +61,14 @@ namespace rndr {
             util::Utils::throw_if_failed(command_list_->Reset(
                 command_allocator_[frame_index_].Get(), nullptr));
 
-            if (scene::SceneSourceFactory::uses_jungle_builder(
-                program_argument_)) {
-                scene_gpu_ =
-                    std::make_unique<scene::BenchmarkSceneGPUData>(
-                        scene::JungleSceneGPUBuilder::build_benchmark(
-                            *scene_cpu_,
-                            device_.Get(),
-                            command_list_.Get(),
-                            used_upload_heaps,
-                            program_argument_.to_load_texture));
-            }
-            else {
-                scene_gpu_ =
-                    std::make_unique<scene::BenchmarkSceneGPUData>(
-                    scene::BenchmarkSceneGPUBuilder::build(
-                        *scene_cpu_,
-                        device_.Get(),
-                        command_list_.Get(),
-                        used_upload_heaps,
-                        program_argument_.to_load_texture));
-            }
+            scene_gpu_ =
+                std::make_unique<scene::BenchmarkSceneGPUData>(
+                scene::BenchmarkSceneGPUBuilder::build(
+                    *scene_cpu_,
+                    device_.Get(),
+                    command_list_.Get(),
+                    used_upload_heaps,
+                    program_argument_.to_load_texture));
 
             util::Utils::throw_if_failed(command_list_->Close(),
                 "close list on resource creation");

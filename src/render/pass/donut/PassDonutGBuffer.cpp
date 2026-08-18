@@ -27,18 +27,6 @@ namespace rndr {
             MATERIAL_SAMPLER,
         };
 
-        enum class JunglePointRootParam : UINT {
-            PUSH_CONSTANT,
-            VIEW_CONSTANT,
-            MATERIAL_CONSTANT,
-            VERTEX_BUFFER,
-            POINT_INSTANCE_BUFFER,
-            POINT_PROTOTYPE_BUFFER,
-            POINT_INSTANCE_ID_BUFFER,
-            MATERIAL_TEXTURES,
-            MATERIAL_SAMPLER,
-        };
-
         struct PushConstants {
             uint32_t start_instance_location = 0;
             uint32_t start_vertex_location = 0;
@@ -49,22 +37,10 @@ namespace rndr {
             uint32_t tangent_offset = 0;
         };
 
-        struct JunglePointPushConstants {
-            uint32_t start_instance_location = 0;
-            uint32_t prototype_id = 0;
-            uint32_t position_offset = 0;
-            uint32_t prev_position_offset = 0;
-            uint32_t texcoord_offset = 0;
-            uint32_t normal_offset = 0;
-            uint32_t tangent_offset = 0;
-            uint32_t pad0 = 0;
-        };
     }
 
     static constexpr UINT PUSH_CONSTANT_DWORD_COUNT =
         sizeof(PushConstants) / sizeof(uint32_t);
-    static constexpr UINT JUNGLE_POINT_PUSH_CONSTANT_DWORD_COUNT =
-        sizeof(JunglePointPushConstants) / sizeof(uint32_t);
 
     void PassDonutGBuffer::init(
         ID3D12Device* device,
@@ -76,10 +52,6 @@ namespace rndr {
         use_prepass_depth_ = use_prepass_depth;
         use_motion_vectors_ = false;
         shader_count_ = resources_.scene->active_material_class_count;
-        util::Logger::g_logger.assert_with_log(
-            (resources_.jungle_scene == nullptr) ==
-                (resources_.jungle_draw_stream == nullptr),
-            "Donut G-buffer Jungle point resources are incomplete.");
 
         for (UINT material_id = 0;
             material_id < resources_.scene->material_data.size();
@@ -177,46 +149,6 @@ namespace rndr {
             pso_.set_shader_count(shader_count_);
         pso_.build();
 
-        if (resources_.jungle_scene != nullptr) {
-            auto jungle_vs = dxutl::compile_shader(
-                L"assets/shaders/mydonut/jungle_point_gbuffer_VS.hlsl",
-                L"vs_6_5", L"main", arguments);
-            jungle_point_pso_.init(device);
-            jungle_point_pso_.set_graphics();
-            auto jungle_root_signature =
-                eng::RootSignatureBuilder{}
-                    .set_flags(
-                        D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)
-                    .constant().reg(1)
-                        .cnt(JUNGLE_POINT_PUSH_CONSTANT_DWORD_COUNT)
-                        .spc(1).vis_vtx().add()
-                    .root_cbv().reg(2).spc(2).vis_vtx().add()
-                    .root_cbv().reg(0).spc(0).vis_pxl().add()
-                    .root_srv().reg(11).spc(1).vis_vtx().add()
-                    .root_srv().reg(14).spc(1).vis_vtx().add()
-                    .root_srv().reg(15).spc(1).vis_vtx().add()
-                    .root_srv().reg(16).spc(1).vis_vtx().add()
-                    .srv_tabl().reg(0)
-                        .cnt(MATERIAL_TEXTURE_DESCRIPTOR_COUNT)
-                        .spc(0).vis_pxl().add()
-                    .spl_tabl().reg(0).cnt(1)
-                        .spc(2).vis_pxl().add()
-                    .build(device);
-            jungle_point_pso_.set_root_signature(
-                jungle_root_signature.Get());
-            jungle_point_pso_.set_shader_vertex(jungle_vs.Get());
-            jungle_point_pso_.set_shader_pixel(ps.Get());
-            jungle_point_pso_.set_manual_vertex_fetch();
-            jungle_point_pso_.set_render_targets(
-                static_cast<UINT>(gbuffer_formats.size()),
-                gbuffer_formats.data());
-            if (use_prepass_depth_) {
-                jungle_point_pso_.set_depth_equal();
-            }
-            if (shader_count_)
-                jungle_point_pso_.set_shader_count(shader_count_);
-            jungle_point_pso_.build();
-        }
     }
 
     void PassDonutGBuffer::render(
@@ -349,105 +281,5 @@ namespace rndr {
                 draw.index_count, draw.instance_count, draw.index_offset, 0, 0);
         }
 
-        if (resources_.jungle_scene == nullptr) {
-            return;
-        }
-
-        command_list->SetGraphicsRootSignature(
-            jungle_point_pso_.get_root_signature());
-        command_list->SetGraphicsRootConstantBufferView(
-            static_cast<UINT>(
-                JunglePointRootParam::VIEW_CONSTANT),
-            resources_.constant_buffers[frame_index]->get()->
-                GetGPUVirtualAddress());
-        command_list->SetGraphicsRootShaderResourceView(
-            static_cast<UINT>(
-                JunglePointRootParam::VERTEX_BUFFER),
-            resources_.scene->vertex_buffer.get()->
-                GetGPUVirtualAddress());
-        command_list->SetGraphicsRootShaderResourceView(
-            static_cast<UINT>(
-                JunglePointRootParam::POINT_INSTANCE_BUFFER),
-            resources_.jungle_scene->point_instance_buffer.get()->
-                GetGPUVirtualAddress());
-        command_list->SetGraphicsRootShaderResourceView(
-            static_cast<UINT>(
-                JunglePointRootParam::POINT_PROTOTYPE_BUFFER),
-            resources_.jungle_scene->point_prototype_buffer.get()->
-                GetGPUVirtualAddress());
-        command_list->SetGraphicsRootShaderResourceView(
-            static_cast<UINT>(
-                JunglePointRootParam::POINT_INSTANCE_ID_BUFFER),
-            resources_.jungle_scene->point_instance_id_buffer.get()->
-                GetGPUVirtualAddress());
-        command_list->SetGraphicsRootDescriptorTable(
-            static_cast<UINT>(
-                JunglePointRootParam::MATERIAL_SAMPLER),
-            resources_.sampler_manager->get_gpu_adr(
-                eng::ResourceManagerSampler::EnumDescPos::
-                    DONUT_MATERIAL));
-
-        current_shader_id = UINT32_MAX;
-        for (const auto& draw :
-            resources_.jungle_draw_stream->
-                point_draw_calls_compacted) {
-            util::Logger::g_logger.assert_with_log(
-                draw.material_id < resources_.scene->material_data.size(),
-                "Donut Jungle G-buffer draw material ID is invalid.");
-            const std::uint32_t shader_id =
-                resources_.scene->material_data[
-                    draw.material_id].virtual_shader_id;
-            util::Logger::g_logger.assert_with_log(
-                !shader_count_ || shader_id < shader_count_,  // due to donut
-                "Donut Jungle G-buffer material class ID is invalid.");
-            if (shader_id != current_shader_id) {
-                command_list->SetPipelineState(
-                    jungle_point_pso_.get(shader_id));
-                current_shader_id = shader_id;
-            }
-
-            const JunglePointPushConstants push_constants{
-                draw.first_instance,
-                draw.prototype_id,
-                resources_.scene->vertex_layout.position_offset,
-                resources_.scene->vertex_layout.prev_position_offset,
-                resources_.scene->vertex_layout.texcoord_offset,
-                resources_.scene->vertex_layout.normal_offset,
-                resources_.scene->vertex_layout.tangent_offset,
-                0
-            };
-            command_list->SetGraphicsRoot32BitConstants(
-                static_cast<UINT>(
-                    JunglePointRootParam::PUSH_CONSTANT),
-                JUNGLE_POINT_PUSH_CONSTANT_DWORD_COUNT,
-                &push_constants,
-                0);
-
-            const D3D12_GPU_VIRTUAL_ADDRESS material_address =
-                resources_.scene->material_constant_buffer.get()->
-                    GetGPUVirtualAddress() +
-                static_cast<D3D12_GPU_VIRTUAL_ADDRESS>(
-                    draw.material_id) *
-                resources_.scene->material_constant_stride;
-            command_list->SetGraphicsRootConstantBufferView(
-                static_cast<UINT>(
-                    JunglePointRootParam::MATERIAL_CONSTANT),
-                material_address);
-            command_list->SetGraphicsRootDescriptorTable(
-                static_cast<UINT>(
-                    JunglePointRootParam::MATERIAL_TEXTURES),
-                resources_.shader_manager->get_gpu_adr(
-                    eng::ResourceManagerShader::EnumDescPos::
-                        DONUT_MATERIAL_TEXTURE_BEGIN,
-                    draw.material_id *
-                        MATERIAL_TEXTURE_DESCRIPTOR_COUNT));
-
-            command_list->DrawIndexedInstanced(
-                draw.index_count,
-                draw.instance_count,
-                draw.index_offset,
-                0,
-                0);
-        }
     }
 }

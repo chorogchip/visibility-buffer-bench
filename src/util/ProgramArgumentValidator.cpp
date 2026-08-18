@@ -11,8 +11,9 @@ namespace util {
 
         auto& logger = util::Logger::g_logger;
 
-        logger.assert_with_log(arg.renderer_variant >= 1,
-            "renderer_variant must be biffer than 1 ");
+        logger.assert_with_log(
+            arg.renderer_variant >= 1 && arg.renderer_variant <= 15,
+            "renderer_variant must be between 1 and 15");
         logger.assert_with_log(arg.visibility_debug_mode <= 11,
             "visibility_debug_mode must be between 0 and 11");
         logger.assert_with_log(arg.window_width > 0, "window_width must be greater than 0");
@@ -64,9 +65,8 @@ namespace util {
                 "scene_path must not be empty when to_use_scene is true");
             logger.assert_with_log(
                 arg.scene_importer == "assimp" ||
-                arg.scene_importer == "jungle" ||
                 arg.scene_importer == "auto",
-                "scene_importer must be assimp, jungle, or auto");
+                "scene_importer must be assimp or auto");
             return;
         }
 

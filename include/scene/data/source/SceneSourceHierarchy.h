@@ -12,56 +12,6 @@
 
 namespace scene::source {
 
-    enum class NodeKind : uint8_t {
-        Generic,
-        SceneRoot,
-        Region,
-        Cell,
-        System,
-        InstanceSet,
-        StaticObject,
-        Camera,
-        UnresolvedContainer,
-        StaticContainer,
-        TerrainContainer,
-        SystemContainer,
-        PrototypeContainer
-    };
-
-    enum class Region : uint8_t {
-        None,
-        Global,
-        Cinematic,
-        Extended,
-        Pyramid
-    };
-
-    enum class Provenance : uint8_t {
-        None,
-        Source,
-        Computed,
-        Inferred
-    };
-
-    enum class UnresolvedReason : uint8_t {
-        None,
-        ExactOrigin,
-        OutsideCellOwnership
-    };
-
-    struct JungleNodeMetadata {
-        std::string cell;
-        std::string system;
-        std::string species;
-        std::string prototype_name;
-        std::string prototype_id;
-        std::string source_object;
-        std::string source_prim;
-        std::string source_layer;
-        Provenance provenance = Provenance::None;
-        UnresolvedReason unresolved_reason = UnresolvedReason::None;
-    };
-
     // Compact TRS is the default representation. The optional affine matrix
     // preserves composed transforms (including shear) that cannot be lowered
     // losslessly to TRS. source_index remains reversible for source arrays.
@@ -98,11 +48,8 @@ namespace scene::source {
         uint32_t first_instance = 0;
         uint32_t instance_count = 0;
 
-        NodeKind kind = NodeKind::Generic;
-        Region region = Region::None;
         math::AABB world_bounds{};
         std::string stable_id;
-        JungleNodeMetadata jungle;
 
         SourceReference source;
         uint32_t parent_node_id = SceneConstants::INVALID_INDEX;

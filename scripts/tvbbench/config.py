@@ -171,15 +171,10 @@ def run_build(config: dict[str, Any], configuration: str) -> None:
         if os.name == "nt" and vcvars is not None:
             rendered = subprocess.list2cmdline(command)
             subprocess.run(
-                [
-                    "cmd.exe",
-                    "/d",
-                    "/s",
-                    "/c",
-                    f'call "{vcvars}" >nul && {rendered}',
-                ],
+                f'call "{vcvars}" >nul && {rendered}',
                 cwd=ROOT,
                 check=True,
+                shell=True,
             )
         else:
             subprocess.run(command, cwd=ROOT, check=True)

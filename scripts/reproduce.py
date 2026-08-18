@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from tvbbench import runner
+from tvbbench.bundle import export_bundle
 from tvbbench.config import (
     DEFAULT_OUTPUT_ROOT,
     ROOT,
@@ -229,6 +230,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true", help="Resolve and count runs only.")
     parser.add_argument("--analyze-only", action="store_true")
     parser.add_argument("--no-plots", action="store_true")
+    parser.add_argument("--no-dashboard-bundle", action="store_true")
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--keep-going", action="store_true")
     return parser
@@ -301,6 +303,11 @@ def main() -> int:
             traceback.print_exc()
         if failures and not arguments.keep_going:
             break
+
+    if not arguments.no_dashboard_bundle:
+        bundle_path = output_root / "dashboard_bundle.json"
+        bundle = export_bundle(output_root, bundle_path)
+        print(f"Dashboard bundle: {bundle_path} ({bundle['experiment_count']} experiment(s))")
 
     print(f"\nCompleted: {len(spec_paths) - failures}, failed: {failures}")
     return 1 if failures else 0

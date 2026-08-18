@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/chorogchip/visibility-buffer-bench/experiments/schema.json",
+  "title": "TVBPerf canonical experiment",
+  "type": "object",
+  "required": ["schema_version", "id", "title", "executable", "reproduction", "base", "analysis"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9_/-]+$"},
+    "title": {"type": "string", "minLength": 1},
+    "summary": {"type": "string"},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "executable": {"type": "string"},
+    "repeat": {"type": "integer", "minimum": 1},
+    "timeout_seconds": {"type": "number", "exclusiveMinimum": 0},
+    "keep_individual_csv": {"type": "boolean"},
+    "base": {"type": "object"},
+    "sweep": {"type": "object"},
+    "samples": {"type": "array", "items": {"type": "object"}},
+    "reproduction": {
+      "type": "object",
+      "required": ["fidelity", "legacy_source"],
+      "properties": {
+        "fidelity": {"enum": ["exact", "adapted"]},
+        "legacy_source": {"type": "string"},
+        "note": {"type": "string"}
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "required": ["plots"],
+      "properties": {
+        "plots": {"type": "array", "items": {"type": "object", "required": ["id", "type"]}}
+      }
+    }
+  },
+  "oneOf": [
+    {"required": ["sweep"], "not": {"required": ["samples"]}},
+    {"required": ["samples"], "not": {"required": ["sweep"]}},
+    {"not": {"anyOf": [{"required": ["sweep"]}, {"required": ["samples"]}]}}
+  ],
+  "additionalProperties": false
+}

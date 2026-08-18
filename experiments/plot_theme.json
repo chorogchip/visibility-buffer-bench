@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "figure_size": [9.0, 5.2],
+  "dpi": 180,
+  "formats": ["png", "svg"],
+  "renderer_families": {
+    "forward": {"light": "#A9D3F5", "medium": "#3D8FC4", "dark": "#005A8D"},
+    "deferred": {"light": "#F6D19A", "medium": "#E69F00", "dark": "#A85F00"},
+    "visbuf": {"light": "#A8DEC9", "medium": "#2FA77D", "dark": "#006A4E"},
+    "utility": {"light": "#F5DB83", "medium": "#D6A100", "dark": "#997300"},
+    "shared": {"light": "#C5BDD9", "medium": "#8877AA", "dark": "#574873"},
+    "other": {"light": "#D0D3D6", "medium": "#90969C", "dark": "#555B61"}
+  },
+  "pass_order": [
+    "depth_prepass",
+    "visibility",
+    "forward",
+    "geometry",
+    "gbuffer",
+    "visutil_histogram",
+    "visutil_prefix",
+    "visutil_flatten",
+    "resolve",
+    "lighting",
+    "tonemap",
+    "other"
+  ],
+  "pass_aliases": {
+    "depth": "depth_prepass",
+    "depth_pre": "depth_prepass",
+    "depth_pre_pass": "depth_prepass",
+    "visibility_pass": "visibility",
+    "g_buffer": "gbuffer",
+    "visbuf_resolve": "resolve",
+    "tone_map": "tonemap"
+  },
+  "passes": {
+    "depth_prepass": {"label": "Depth pre-pass", "color": "#A9D3F5"},
+    "visibility": {"label": "Visibility", "color": "#A8DEC9"},
+    "forward": {"label": "Forward shading", "color": "#3D8FC4"},
+    "geometry": {"label": "Geometry", "color": "#E69F00"},
+    "gbuffer": {"label": "G-buffer", "color": "#2FA77D"},
+    "visutil_histogram": {"label": "Bin histogram", "color": "#F5DB83"},
+    "visutil_prefix": {"label": "Bin prefix", "color": "#D6A100"},
+    "visutil_flatten": {"label": "Bin flatten", "color": "#997300"},
+    "resolve": {"label": "Resolve", "color": "#006A4E"},
+    "lighting": {"label": "Lighting", "color": "#A85F00"},
+    "tonemap": {"label": "Tonemap", "color": "#8877AA"},
+    "other": {"label": "Other", "color": "#90969C"}
+  }
+}

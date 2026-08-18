@@ -1,0 +1,121 @@
+{
+  "$schema": "../../schema.json",
+  "schema_version": 1,
+  "id": "synthetic/legacy_overdraw_alu_orthogonal",
+  "title": "Legacy Overdraw Alu Orthogonal",
+  "summary": "legacy overdraw alu orthogonal",
+  "tags": [
+    "synthetic"
+  ],
+  "reproduction": {
+    "fidelity": "adapted",
+    "legacy_source": "datas/experiments_2/succeed/ex5_overdraw_alu_orthogonal/overdraw_alu_orthogonal.json",
+    "note": "Legacy schema was completed with explicit current defaults where required. Removed arguments no longer accepted by ProgramArgument: renderer_variant_name, run_current_time."
+  },
+  "executable": "@executable/release",
+  "repeat": 1,
+  "keep_individual_csv": false,
+  "base": {
+    "_renderer_variant": 1,
+    "variable": 1,
+    "to_use_scene": false,
+    "scene_path": "@scene/sponza",
+    "warmup_frames": 600,
+    "measure_frames": 120,
+    "window_width": 1280,
+    "window_height": 720,
+    "seed": 0,
+    "camera_pos_x": 0.0,
+    "camera_pos_y": 0.0,
+    "camera_pos_z": -10.0,
+    "camera_lookat_x": 0.0,
+    "camera_lookat_y": 0.0,
+    "camera_lookat_z": 0.0,
+    "camera_near_z": 0.1,
+    "camera_far_z": 1000.0,
+    "camera_fov": 0.11,
+    "object_count": 256,
+    "material_count": 1,
+    "geometry_count": 1,
+    "_overdraw_count": 0,
+    "z_min": -1.0,
+    "z_max": 1.0,
+    "xy_minmax": 1.0,
+    "radius": 0.5,
+    "geometry_div": 16,
+    "gbuffer_cnt": 1,
+    "texture_count": 1,
+    "texture_size": 256,
+    "texture_sampling_count": 1,
+    "_alu_calc_count": 0,
+    "visibility_debug_mode": 0,
+    "donut_linear_gbuffer": false,
+    "to_load_texture": false,
+    "use_vfc": false,
+    "scene_variant": 0,
+    "scene_importer": "assimp",
+    "vsync": false,
+    "camera_mode": 0,
+    "camera_filepath": "@camera/standard_camera",
+    "camera_keyframe_interval": 10,
+    "to_set_start_frame": false,
+    "key_frame": 0,
+    "profile_window_frames": 10,
+    "capture_frames": false,
+    "capture_stride": 1,
+    "capture_fps": 60,
+    "material_assign_strategy": 0,
+    "material_assign_max_open": 255,
+    "material_assign_locality": 1.0,
+    "material_assign_diversity": 1.0,
+    "to_remain_only_in_camera": false
+  },
+  "sweep": {
+    "overdraw_count": [
+      0,
+      1,
+      2,
+      4,
+      8,
+      12,
+      16,
+      24,
+      32,
+      48
+    ],
+    "alu_calc_count": [
+      0,
+      1,
+      2,
+      4,
+      8,
+      12,
+      16,
+      24,
+      32,
+      48,
+      64
+    ],
+    "renderer_variant": [
+      1,
+      2,
+      4
+    ]
+  },
+  "analysis": {
+    "plots": [
+      {
+        "id": "total_time",
+        "type": "total",
+        "x": "auto",
+        "metric": "total_time_median_ms",
+        "title": "Median GPU time"
+      },
+      {
+        "id": "pass_breakdown",
+        "type": "pass_breakdown",
+        "title": "GPU pass breakdown"
+      }
+    ]
+  }
+}

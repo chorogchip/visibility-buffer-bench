@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "id": "smoke",
+  "title": "Synthetic pipeline smoke test",
+  "specs": [
+    "../specs/synthetic/followup_01_synth_decoupling_smoke.json"
+  ]
+}

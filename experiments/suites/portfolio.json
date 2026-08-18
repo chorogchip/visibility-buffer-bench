@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "portfolio",
+  "title": "Portfolio evidence set",
+  "specs": [
+    "../specs/material/material_00_smoke_synthetic_material_grid.json",
+    "../specs/synthetic/followup_02_synth_material_count_same_class_dense.json",
+    "../specs/synthetic/followup_03_synth_class_count_fixed_materials_dense.json",
+    "../specs/synthetic/followup_06_synth_locality_diversity_phase_dense.json",
+    "../specs/synthetic/followup_08_synth_workload_scaling_dense.json",
+    "../specs/synthetic/followup_09_synth_resolution_scaling_dense.json",
+    "../specs/real_scenes/followup_00_renderer_fairness_smoke.json",
+    "../specs/real_scenes/followup_14_real_full_camera_linear_control.json",
+    "../specs/real_scenes/followup_15_real_texture_vfc_ablation.json",
+    "../specs/real_scenes/followup_17_real_material_camera_sponza_texture_on.json",
+    "../specs/real_scenes/followup_17_real_material_camera_bistro_texture_on.json",
+    "../specs/validation/01_sponza_barycentric_validation.json",
+    "../specs/validation/03_bistro_barycentric_validation.json",
+    "../specs/validation/40_real_scene_raster_stats_all.json",
+    "../specs/captures/material_31_capture_representative_frames.json"
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "$schema": "../../schema.json",
+  "schema_version": 1,
+  "id": "validation/03_bistro_barycentric_validation",
+  "title": "03 Bistro Barycentric Validation",
+  "summary": "Full-HD Bistro camera-path correctness comparison: hardware raster interpolation/derivatives versus analytic VisBuf reconstruction.",
+  "tags": [
+    "validation",
+    "runnable_now"
+  ],
+  "reproduction": {
+    "fidelity": "exact",
+    "legacy_source": "datas/experiments_3/barycentric_validation/03_bistro_barycentric_validation.json"
+  },
+  "executable": "@executable/release",
+  "repeat": 1,
+  "timeout_seconds": 7200,
+  "keep_individual_csv": true,
+  "base": {
+    "renderer_variant": 14,
+    "visibility_debug_mode": 3,
+    "variable": 0,
+    "to_use_scene": true,
+    "to_load_texture": true,
+    "use_vfc": true,
+    "scene_variant": 0,
+    "scene_importer": "assimp",
+    "scene_path": "@scene/bistro",
+    "warmup_frames": 60,
+    "measure_frames": 5500,
+    "vsync": false,
+    "camera_mode": 2,
+    "camera_filepath": "@camera/standard_camera_bistro",
+    "camera_keyframe_interval": 10,
+    "to_set_start_frame": false,
+    "key_frame": 0,
+    "profile_window_frames": 60,
+    "capture_frames": true,
+    "capture_stride": 120,
+    "capture_fps": 12,
+    "window_width": 1920,
+    "window_height": 1080,
+    "seed": 0,
+    "material_assign_strategy": 1,
+    "material_assign_max_open": 255,
+    "material_assign_locality": 1.0,
+    "material_assign_diversity": 1.0,
+    "camera_pos_x": 0.0,
+    "camera_pos_y": 0.0,
+    "camera_pos_z": -10.0,
+    "camera_lookat_x": 0.0,
+    "camera_lookat_y": 0.0,
+    "camera_lookat_z": 0.0,
+    "camera_near_z": 0.1,
+    "camera_far_z": 1000.0,
+    "camera_fov": 0.785,
+    "object_count": 1,
+    "material_count": 1,
+    "geometry_count": 1,
+    "overdraw_count": 0,
+    "to_remain_only_in_camera": false,
+    "z_min": -1.0,
+    "z_max": 1.0,
+    "xy_minmax": 1.0,
+    "radius": 0.5,
+    "geometry_div": 1,
+    "gbuffer_cnt": 1,
+    "texture_count": 1,
+    "texture_size": 256,
+    "texture_sampling_count": 1,
+    "alu_calc_count": 100
+  },
+  "sweep": {
+    "renderer_variant": [
+      14,
+      13
+    ],
+    "visibility_debug_mode": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "analysis": {
+    "plots": [
+      {
+        "id": "total_time",
+        "type": "total",
+        "x": "auto",
+        "metric": "total_time_median_ms",
+        "title": "Median GPU time"
+      },
+      {
+        "id": "pass_breakdown",
+        "type": "pass_breakdown",
+        "title": "GPU pass breakdown"
+      }
+    ],
+    "capture_modes": {
+      "3": "linear_barycentric",
+      "4": "perspective_barycentric",
+      "5": "linear_barycentric_dx",
+      "6": "linear_barycentric_dy",
+      "7": "uv_dx",
+      "8": "uv_dy",
+      "9": "uv_lod_proxy_1024px"
+    }
+  }
+}

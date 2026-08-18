@@ -1,5 +1,6 @@
 # Build
 out/
+results/
 
 #libs
 external/
@@ -119,6 +120,9 @@ __pycache__/
 
 # Local ad-hoc benchmark runner output
 scripts/results/default/
+
+# Machine-local benchmark paths
+experiments/local.json
 
 # Crash dumps
 *.dmp

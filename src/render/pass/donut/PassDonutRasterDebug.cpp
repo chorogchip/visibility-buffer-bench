@@ -89,7 +89,7 @@ namespace rndr {
             std::to_wstring(static_cast<std::uint32_t>(mode))
         };
         auto vs = dxutl::compile_shader(
-            L"assets/shaders/mydonut/donut_visibility_VS.hlsl",
+            L"assets/shaders/mydonut/donut_raster_debug_VS.hlsl",
             L"vs_6_5", L"main", arguments);
         auto ps = dxutl::compile_shader(
             L"assets/shaders/mydonut/donut_raster_debug_PS.hlsl",
